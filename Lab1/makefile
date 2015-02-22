@@ -46,7 +46,7 @@ TARGET_BASE1=myHead
 TARGET1 = $(TARGET_BASE1)$(TARGET_EXTENSION)
 SRC_FILES1=$(PROJECT_ROOT)main.c  test/myHeadTest.c
 # SRC_FILES2=$(UNITY_ROOT)/src/unity.c src/ProductionCode2.c test/TestProductionCode2.c test/test_runners/TestProductionCode2_Runner.c
-INC_DIRS=-Isrc -I$(UNITY_ROOT)/src
+INC_DIRS=-Isrc -I$(UNITY_ROOT)/src -I$(UNITY_ROOT)/extras/fixture/src
 SYMBOLS=-DTEST
 
 all: clean default

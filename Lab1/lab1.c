@@ -28,7 +28,7 @@ must include the following functions:
 
 #define MAX_LINE_LENGTH = 100;
 
-int main(int argc, char* argv[]){
+int main(void){
     printf("hello world");
     exit(EXIT_SUCCESS);
 }
