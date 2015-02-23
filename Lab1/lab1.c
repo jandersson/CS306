@@ -28,7 +28,33 @@ must include the following functions:
 
 #define MAX_LINE_LENGTH = 100;
 
-int main(void){
-    printf("hello world");
+void print_args(int argc, char * argv[]);
+void head_lines(FILE * fpntr, int lines);
+void head_chars(FILE *fpntr, int chars);
+char * get_next_line(FILE * fpntr);
+
+// Global State
+// Default behaviour is to print 10 lines
+int n_option = 10;
+int c_option = 0;
+
+int get_option_value(char * opt, int argc, char * argv[])
+{
+
+}
+
+void print_args(int argc, char * argv[])
+{
+  printf("Number of options: %d\n", argc-1);
+  for (int i = 1; i < argc; i++){
+    printf("Argument %d: %s\n", i, argv[i]);
+  }
+}
+
+int main(int argc, char * argv[])
+{
+    char * opt = "-n";
+    print_args(argc, argv);
+    n_option = get_option_value(opt, argc, argv);
     exit(EXIT_SUCCESS);
 }
