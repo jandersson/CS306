@@ -28,18 +28,26 @@ must include the following functions:
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_LINE_LENGTH = 100;
+#define MAX_LINE_LENGTH 100
 
 void print_args(int argc, char * argv[]);
 void head_lines(FILE * fpntr, int lines);
 void head_chars(FILE * fpntr, int chars);
 char * get_next_line(FILE * fpntr);
 int decode_options(char * opts_to_find, int argc, char * argv[]);
+void read_file(char * file_name);
 
 // Global State
 // Default behaviour is to print 10 lines
 int n_option = 10;
 int c_option = 0;
+
+void read_file(char * file_name)
+{
+  char buffer[MAX_LINE_LENGTH];
+  FILE * fptr = fopen(file_name, "r");
+  fclose(fptr);
+}
 
 int decode_options(char * opts_to_find, int argc, char * argv[])
 {
@@ -54,9 +62,11 @@ int decode_options(char * opts_to_find, int argc, char * argv[])
   //    argc, argv: command line argument list and count
   //  This function returns:
   //    an integer
-  int opt;
+  int opt, _optind;
   while ((opt = getopt(argc, argv, opts_to_find)) != -1)
   {
+    _optind = optind;
+    printf("optind: %i\n", _optind);
     switch(opt)
     {
       case 'n':
@@ -70,12 +80,26 @@ int decode_options(char * opts_to_find, int argc, char * argv[])
         printf("c's argument: %i\n", c_option);
         break;
       default:
-        printf("Usage: %s", argv[0]);
+        printf("Usage: %s\n", argv[0]);
         exit(EXIT_FAILURE);
     }
   }
-  return 0; //Temporary
+  printf("Whats in argv[%d]?\n", _optind);
+  printf("Probably a segfault, dummy\n");
+  printf("argc: %i, optind: %i\n", argc, optind);
+  int number_file_inputs;
+  int first_file_index;
+  number_file_inputs = argc - optind;
+  if ((number_file_inputs) > 0)
+  {
+    first_file_index = optind;
+  }
+  printf("%d files were specified\n", number_file_inputs);
+  printf("%d is the index of the first file\n", first_file_index);
+
+  return first_file_index;
 }
+
 
 void print_args(int argc, char * argv[])
 {
@@ -86,9 +110,14 @@ void print_args(int argc, char * argv[])
   }
 }
 
+
 int main(int argc, char * argv[])
 {
+    int file_ind;
     char * opts_to_find = "n:c:";
-    decode_options(opts_to_find, argc, argv);
+    file_ind = decode_options(opts_to_find, argc, argv);
+    printf("file_ind: %d\n", file_ind);
+    printf("argv[%d]: %s\n", file_ind, argv[file_ind]);
+    read_file(argv[file_ind]);
     exit(EXIT_SUCCESS);
 }
