@@ -41,6 +41,7 @@ int c_option = 0;
 int get_option_value(char * opt, int argc, char * argv[])
 {
 
+  return 0; //Temporary
 }
 
 void print_args(int argc, char * argv[])
