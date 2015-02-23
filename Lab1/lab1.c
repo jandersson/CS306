@@ -25,12 +25,14 @@ must include the following functions:
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <unistd.h> //for getopt
 
 #define MAX_LINE_LENGTH = 100;
 
 void print_args(int argc, char * argv[]);
 void head_lines(FILE * fpntr, int lines);
-void head_chars(FILE *fpntr, int chars);
+void head_chars(FILE * fpntr, int chars);
 char * get_next_line(FILE * fpntr);
 
 // Global State
@@ -40,7 +42,15 @@ int c_option = 0;
 
 int get_option_value(char * opt, int argc, char * argv[])
 {
-
+  // Loop through the arguments in argv and look for anything
+  // starting with - followed by n or c
+  for (int arg = 0; arg < argc; arg++)
+  {
+    printf("Size of argument: %lu\n", sizeof(argv[arg]));
+    if (strncmp(argv[arg], "-n", 8) == 0){
+      printf("%s\n", argv[arg]);
+    }
+  }
   return 0; //Temporary
 }
 
