@@ -88,7 +88,7 @@ int decode_options(char * opts_to_find, int argc, char * argv[])
   printf("Probably a segfault, dummy\n");
   printf("argc: %i, optind: %i\n", argc, optind);
   int number_file_inputs;
-  int first_file_index;
+  int first_file_index = 0;
   number_file_inputs = argc - optind;
   if ((number_file_inputs) > 0)
   {
@@ -116,6 +116,12 @@ int main(int argc, char * argv[])
     int file_ind;
     char * opts_to_find = "n:c:";
     file_ind = decode_options(opts_to_find, argc, argv);
+    if (file_ind == 0)
+    {
+      // If no file is specified, the index will be 0 and the program
+      // should terminate
+      exit(EXIT_FAILURE);
+    }
     printf("file_ind: %d\n", file_ind);
     printf("argv[%d]: %s\n", file_ind, argv[file_ind]);
     read_file(argv[file_ind]);
