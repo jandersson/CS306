@@ -22,11 +22,12 @@ must include the following functions:
     void head_chars(FILE *fpntr, int chars)
     char *get_next_line(FILE *fpntr)
  */
-
+#include <unistd.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h> //for getopt
+
 
 #define MAX_LINE_LENGTH = 100;
 
@@ -40,7 +41,7 @@ char * get_next_line(FILE * fpntr);
 int n_option = 10;
 int c_option = 0;
 
-int get_option_value(char * opt, int argc, char * argv[])
+int decode_options(char * opt, int argc, char * argv[])
 {
   // Loop through the arguments in argv and look for anything
   // starting with - followed by n or c
@@ -66,7 +67,12 @@ void print_args(int argc, char * argv[])
 
 int main(int argc, char * argv[])
 {
-    char * opt = "-n";
+    int opt;
+    while ((opt = getopt(argc, argv, "nc:")) != -1)
+    {
+      printf("Opt: %i %s\n", opt, optarg);
+    }
+
     //print_args(argc, argv);
     //n_option = get_option_value(opt, argc, argv);
     exit(EXIT_SUCCESS);
