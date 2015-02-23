@@ -67,7 +67,7 @@ void print_args(int argc, char * argv[])
 int main(int argc, char * argv[])
 {
     char * opt = "-n";
-    print_args(argc, argv);
-    n_option = get_option_value(opt, argc, argv);
+    //print_args(argc, argv);
+    //n_option = get_option_value(opt, argc, argv);
     exit(EXIT_SUCCESS);
 }
