@@ -36,11 +36,16 @@ void head_chars(FILE * fpntr, int chars);
 char * get_next_line(FILE * fpntr);
 int decode_options(char * opts_to_find, int argc, char * argv[]);
 void read_file(char * file_name);
-
+void print_usage(char * argv[]);
 // Global State
 // Default behaviour is to print 10 lines
 int n_option = 10;
 int c_option = 0;
+
+void print_usage(char * argv[])
+{
+  printf("Usage: %s [-n #] [-c #]\n", argv[0]);
+}
 
 void read_file(char * file_name)
 {
@@ -80,7 +85,7 @@ int decode_options(char * opts_to_find, int argc, char * argv[])
         printf("c's argument: %i\n", c_option);
         break;
       default:
-        printf("Usage: %s\n", argv[0]);
+        print_usage(argv);
         exit(EXIT_FAILURE);
     }
   }
@@ -113,6 +118,7 @@ void print_args(int argc, char * argv[])
 
 int main(int argc, char * argv[])
 {
+    print_usage(argv);
     int file_ind;
     char * opts_to_find = "n:c:";
     file_ind = decode_options(opts_to_find, argc, argv);
