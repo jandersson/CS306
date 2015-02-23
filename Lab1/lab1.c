@@ -42,17 +42,31 @@ void print_usage(char * argv[]);
 int n_option = 10;
 int c_option = 0;
 
+
 void print_usage(char * argv[])
 {
   printf("Usage: %s [-n #] [-c #]\n", argv[0]);
 }
 
+
 void read_file(char * file_name)
 {
+  // Will produce a segfault if the file does not exist
+  // head checks for a file existing, if not prints:
+  //    head: cannot open ‘filename.txt’ for reading: No such file or directory
+
   char buffer[MAX_LINE_LENGTH];
+  int c;
   FILE * fptr = fopen(file_name, "r");
+  while ((c = fgetc(fptr)) != EOF)
+  {
+    int character = c;
+    printf("%c",c);
+  }
+
   fclose(fptr);
 }
+
 
 int decode_options(char * opts_to_find, int argc, char * argv[])
 {
@@ -89,9 +103,6 @@ int decode_options(char * opts_to_find, int argc, char * argv[])
         exit(EXIT_FAILURE);
     }
   }
-  printf("Whats in argv[%d]?\n", _optind);
-  printf("Probably a segfault, dummy\n");
-  printf("argc: %i, optind: %i\n", argc, optind);
   int number_file_inputs;
   int first_file_index = 0;
   number_file_inputs = argc - optind;
@@ -118,7 +129,6 @@ void print_args(int argc, char * argv[])
 
 int main(int argc, char * argv[])
 {
-    print_usage(argv);
     int file_ind;
     char * opts_to_find = "n:c:";
     file_ind = decode_options(opts_to_find, argc, argv);
@@ -128,6 +138,7 @@ int main(int argc, char * argv[])
       // should terminate
       exit(EXIT_FAILURE);
     }
+    // Loop through file args
     printf("file_ind: %d\n", file_ind);
     printf("argv[%d]: %s\n", file_ind, argv[file_ind]);
     read_file(argv[file_ind]);
