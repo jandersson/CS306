@@ -28,7 +28,6 @@ must include the following functions:
 #include <stdlib.h>
 #include <string.h>
 
-
 #define MAX_LINE_LENGTH = 100;
 
 void print_args(int argc, char * argv[]);
@@ -44,16 +43,35 @@ int c_option = 0;
 
 int decode_options(char * opts_to_find, int argc, char * argv[])
 {
-  // Loop through the arguments in argv and look for anything
-  // starting with - followed by n or c
+  //  This function will:
+  //    Decode the command line arguments using the getopt function
+  //    For personal reference the opts_to_find is a string with
+  //    the characters to look for. A ":" adjacent to a character
+  //    indicates that it has required arguments and will store the arguments
+  //    in the string "optarg"
+  //  This function takes:
+  //    opts_to_find: a string of options to look for
+  //    argc, argv: command line argument list and count
+  //  This function returns:
+  //    an integer
   int opt;
   while ((opt = getopt(argc, argv, opts_to_find)) != -1)
   {
     switch(opt)
     {
       case 'n':
-        printf("I Gots an n :B!!");
+        printf("Option -n\n");
+        n_option = atoi(optarg);
+        printf("n's argument: %i\n", n_option);
         break;
+      case 'c':
+        printf("Option -c\n");
+        c_option = atoi(optarg);
+        printf("c's argument: %i\n", c_option);
+        break;
+      default:
+        printf("Usage: %s", argv[0]);
+        exit(EXIT_FAILURE);
     }
   }
   return 0; //Temporary
@@ -70,7 +88,7 @@ void print_args(int argc, char * argv[])
 
 int main(int argc, char * argv[])
 {
-    char * opts_to_find = "nc:";
+    char * opts_to_find = "n:c:";
     decode_options(opts_to_find, argc, argv);
     exit(EXIT_SUCCESS);
 }
