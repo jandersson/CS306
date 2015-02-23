@@ -47,7 +47,8 @@ int get_option_value(char * opt, int argc, char * argv[])
   for (int arg = 0; arg < argc; arg++)
   {
     printf("Size of argument: %lu\n", sizeof(argv[arg]));
-    if (strncmp(argv[arg], "-n", 8) == 0){
+    if (strncmp(argv[arg], "-n", 8) == 0)
+    {
       printf("%s\n", argv[arg]);
     }
   }
@@ -57,7 +58,8 @@ int get_option_value(char * opt, int argc, char * argv[])
 void print_args(int argc, char * argv[])
 {
   printf("Number of options: %d\n", argc-1);
-  for (int i = 1; i < argc; i++){
+  for (int i = 1; i < argc; i++)
+  {
     printf("Argument %d: %s\n", i, argv[i]);
   }
 }
