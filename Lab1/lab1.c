@@ -46,8 +46,16 @@ int decode_options(char * opts_to_find, int argc, char * argv[])
 {
   // Loop through the arguments in argv and look for anything
   // starting with - followed by n or c
-  int opts;
-  while (opts = getopt(argc, argv, opt))
+  int opt;
+  while ((opt = getopt(argc, argv, opts_to_find)) != -1)
+  {
+    switch(opt)
+    {
+      case 'n':
+        printf("I Gots an n :B!!");
+        break;
+    }
+  }
   return 0; //Temporary
 }
 
@@ -62,14 +70,7 @@ void print_args(int argc, char * argv[])
 
 int main(int argc, char * argv[])
 {
-    char * opts_to_find;
-    *opts_to_find = "nc:";
-    while ((opt = getopt(argc, argv, "nc:")) != -1)
-    {
-      printf("Opt: %i %s\n", opt, optarg);
-    }
-
-    //print_args(argc, argv);
-    //n_option = get_option_value(opt, argc, argv);
+    char * opts_to_find = "nc:";
+    decode_options(opts_to_find, argc, argv);
     exit(EXIT_SUCCESS);
 }
