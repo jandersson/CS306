@@ -35,24 +35,19 @@ void print_args(int argc, char * argv[]);
 void head_lines(FILE * fpntr, int lines);
 void head_chars(FILE * fpntr, int chars);
 char * get_next_line(FILE * fpntr);
+int decode_options(char * opts_to_find, int argc, char * argv[]);
 
 // Global State
 // Default behaviour is to print 10 lines
 int n_option = 10;
 int c_option = 0;
 
-int decode_options(char * opt, int argc, char * argv[])
+int decode_options(char * opts_to_find, int argc, char * argv[])
 {
   // Loop through the arguments in argv and look for anything
   // starting with - followed by n or c
-  for (int arg = 0; arg < argc; arg++)
-  {
-    printf("Size of argument: %lu\n", sizeof(argv[arg]));
-    if (strncmp(argv[arg], "-n", 8) == 0)
-    {
-      printf("%s\n", argv[arg]);
-    }
-  }
+  int opts;
+  while (opts = getopt(argc, argv, opt))
   return 0; //Temporary
 }
 
@@ -67,7 +62,8 @@ void print_args(int argc, char * argv[])
 
 int main(int argc, char * argv[])
 {
-    int opt;
+    char * opts_to_find;
+    *opts_to_find = "nc:";
     while ((opt = getopt(argc, argv, "nc:")) != -1)
     {
       printf("Opt: %i %s\n", opt, optarg);
