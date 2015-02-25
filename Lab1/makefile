@@ -3,4 +3,4 @@ COMPILER = gcc
 FLAGS = -std=c99
 
 all: $(TARGET)
-	$(COMPILER) $(FLAGS) -o myHead $(TARGET)
+	$(COMPILER) $(FLAGS) -o myhead $(TARGET)
