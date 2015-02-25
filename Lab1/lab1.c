@@ -21,6 +21,8 @@ must include the following functions:
     void head_lines(FILE *fpntr, int lines)
     void head_chars(FILE *fpntr, int chars)
     char *get_next_line(FILE *fpntr)
+
+TODO: Capture input from stdin when no files are given
  */
 #include <unistd.h>
 #include <getopt.h>
@@ -30,22 +32,35 @@ must include the following functions:
 
 #define MAX_LINE_LENGTH 100
 
+
+// Function Prototypes
+
+
 void print_args(int argc, char * argv[]);
 void head_lines(FILE * fpntr, int lines);
 void head_chars(FILE * fpntr, int chars);
 char * get_next_line(FILE * fpntr);
 int decode_options(char * opts_to_find, int argc, char * argv[]);
-FILE * read_file(char * file_name);
+FILE * get_stream(char * file_name);
 void print_usage(char * argv[]);
+
+
 // Global State
+
+
 // Default behaviour is to print 10 lines
+// Specifies the number of lines to print from the file
 int n_option = 10;
+// Specifies the number of bytes to print from the file
 int c_option = 0;
 
+
 // Display related functions
+
+
 void print_usage(char * argv[])
 {
-  printf("Usage: %s [-n #] [-c #]\n", argv[0]);
+  printf("Usage: %s [-n # | -c #] {FILE}\n", argv[0]);
 }
 
 
@@ -58,27 +73,47 @@ void print_args(int argc, char * argv[])
   }
 }
 
+
 // Required functions
+
 
 void head_chars(FILE * fpntr, int chars)
 {
   int chars_iter = 0;
   int c;
-  while ((c = fgetc(fpntr)) != EOF && chars_iter < chars)
+  if (fpntr == stdin)
   {
-    int character = c;
-    printf("%c",c);
-    chars_iter++;
+    while ((c = fgetc(fpntr)) != EOF)
+    {
+      printf("%c",c);
+    }
+  }
+  else
+  {
+    while ((c = fgetc(fpntr)) != EOF && chars_iter < chars)
+    {
+      printf("%c",c);
+      chars_iter++;
+    }
   }
   fclose(fpntr);
 }
 
-FILE * read_file(char * file_name)
+
+void head_lines(FILE * fpntr, int lines)
+{
+
+}
+
+
+// Helper functions
+
+
+FILE * get_stream(char * file_name)
 {
   // Will produce a segfault if the file does not exist
   // head checks for a file existing, if not prints:
   //    head: cannot open ‘filename.txt’ for reading: No such file or directory
-
   char buffer[MAX_LINE_LENGTH];
   int c;
   FILE * fptr = fopen(file_name, "r");
@@ -135,26 +170,23 @@ int decode_options(char * opts_to_find, int argc, char * argv[])
 }
 
 
-
-
-
 int main(int argc, char * argv[])
 {
+  //Determine if there are file arguments
     int file_ind;
-    FILE * IM_A_FILE;
+    FILE * file;
     char * opts_to_find = "n:c:";
     file_ind = decode_options(opts_to_find, argc, argv);
     if (file_ind == 0)
     {
       // If no file is specified, the index will be 0 and the program
       // should read from standard input
-      exit(EXIT_FAILURE);
+      file = stdin;
+      head_chars(file, c_option);
     }
     // Loop through file args
-    printf("file_ind: %d\n", file_ind);
-    printf("argv[%d]: %s\n", file_ind, argv[file_ind]);
-    IM_A_FILE = read_file(argv[file_ind]);
-    head_chars(IM_A_FILE, 30);
-    //fclose(IM_A_FILE);
+    // Prints the first file: printf("argv[%d]: %s\n", file_ind, argv[file_ind]);
+    file = get_stream(argv[file_ind]);
+    head_chars(file, c_option);
     exit(EXIT_SUCCESS);
 }
