@@ -40,19 +40,19 @@ void print_args(int argc, char * argv[]);
 void head_lines(FILE * fpntr, int lines);
 void head_chars(FILE * fpntr, int chars);
 char * get_next_line(FILE * fpntr);
-int decode_options(char * opts_to_find, int argc, char * argv[]);
+int decode_options(char * opts_to_find, int argc, char * argv[], int c_option,int n_option);
 FILE * get_stream(char * file_name);
 void print_usage(char * argv[]);
 
 
 // Global State
 
-
+// TODO: Get rid of these global vars
 // Default behaviour is to print 10 lines
 // Specifies the number of lines to print from the file
-int n_option = 10;
+// int n_option = 10;
 // Specifies the number of bytes to print from the file
-int c_option = 0;
+// int c_option = 0;
 
 
 // Display related functions
@@ -81,21 +81,25 @@ void head_chars(FILE * fpntr, int chars)
 {
   int chars_iter = 0;
   int c;
-  if (fpntr == stdin)
-  {
-    while ((c = fgetc(fpntr)) != EOF)
-    {
-      printf("%c",c);
-    }
-  }
-  else
-  {
+  // if (fpntr == stdin)
+  // {
+  //   chars == INT_MAX;
+  // }
+  // if (fpntr == stdin)
+  // {
+  //   while ((c = fgetc(fpntr)) != EOF)
+  //   {
+  //     printf("%c",c);
+  //   }
+  // }
+  // else
+  // {
     while ((c = fgetc(fpntr)) != EOF && chars_iter < chars)
     {
       printf("%c",c);
       chars_iter++;
     }
-  }
+  // }
   fclose(fpntr);
 }
 
@@ -103,6 +107,14 @@ void head_chars(FILE * fpntr, int chars)
 void head_lines(FILE * fpntr, int lines)
 {
 
+}
+
+
+char * get_next_line(FILE * fpntr)
+{
+  static char buff[MAX_LINE_LENGTH];
+  fgets(buff, 100, fpntr); //CHANGE THIS
+  return buff;
 }
 
 
@@ -116,12 +128,21 @@ FILE * get_stream(char * file_name)
   //    head: cannot open ‘filename.txt’ for reading: No such file or directory
   char buffer[MAX_LINE_LENGTH];
   int c;
-  FILE * fptr = fopen(file_name, "r");
+  FILE * fptr;
+
+  if (((fptr = fopen(file_name, "r")) == NULL))
+  {
+    fprintf(stderr, "Error: No such file");
+  }
+  else
+  {
+    FILE * fptr = fopen(file_name, "r");
+  }
   return fptr;
 }
 
 
-int decode_options(char * opts_to_find, int argc, char * argv[])
+int decode_options(char * opts_to_find, int argc, char * argv[], int c_option, int n_option)
 {
   //  This function will:
   //    Decode the command line arguments using the getopt function
@@ -138,7 +159,6 @@ int decode_options(char * opts_to_find, int argc, char * argv[])
   while ((opt = getopt(argc, argv, opts_to_find)) != -1)
   {
     _optind = optind;
-    printf("optind: %i\n", _optind);
     switch(opt)
     {
       case 'n':
@@ -173,10 +193,11 @@ int decode_options(char * opts_to_find, int argc, char * argv[])
 int main(int argc, char * argv[])
 {
   //Determine if there are file arguments
-    int file_ind;
+    int file_ind, ok, c_option;
+    int n_option = 10;
     FILE * file;
     char * opts_to_find = "n:c:";
-    file_ind = decode_options(opts_to_find, argc, argv);
+    file_ind = decode_options(opts_to_find, argc, argv, c_option, n_option);
     if (file_ind == 0)
     {
       // If no file is specified, the index will be 0 and the program
@@ -187,6 +208,12 @@ int main(int argc, char * argv[])
     // Loop through file args
     // Prints the first file: printf("argv[%d]: %s\n", file_ind, argv[file_ind]);
     file = get_stream(argv[file_ind]);
+    //head_lines logic
+    for (int i = 0; i < n_option; i++)
+    {
+      printf("Line#%i: %s", i+1, get_next_line(file));
+    }
+
     head_chars(file, c_option);
     exit(EXIT_SUCCESS);
 }
