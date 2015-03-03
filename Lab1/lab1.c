@@ -36,9 +36,6 @@ TODO: Capture input from stdin when no files are given
 
 #define MAX_LINE_LENGTH 100
 
-// Global State
-//This variable will enable various code tracing functionality
-int debug = 0;
 // Function Prototypes
 
 
@@ -68,9 +65,6 @@ void print_args(int argc, char * argv[]){
 
 
 void head_chars(FILE * fpntr, int chars){
-  if (debug == 1){
-    printf("head_chars called with chars = %i\n", chars);
-  }
   int chars_iter = 0;
   int c;
     while ((c = fgetc(fpntr)) != EOF && chars_iter < chars)
@@ -161,7 +155,6 @@ int decode_options(char * opts_to_find, int argc, char * argv[], int * c_option,
   if ((number_file_inputs) > 0){
     first_file_index = optind;
   }
-  //! Tracing Code
   return first_file_index;
 }
 
@@ -178,10 +171,6 @@ int main(int argc, char * argv[])
   int n_option = 10;
   FILE * file;
   char * opts_to_find = "n:c:";
-  //! Tracing Code
-  if(debug == 1){
-    printf("argc: %i\n", argc);
-  }
   //! Decode the command line arguments, get the number of lines/chars to print
   //! and the index of the first file argument
   file_ind = decode_options(opts_to_find, argc, argv, &c_option, &n_option);
