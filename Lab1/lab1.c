@@ -83,19 +83,33 @@ void head_chars(FILE * fpntr, int chars){
 
 
 void head_lines(FILE * fpntr, int lines){
-  if (debug == 1){
-    printf("head_lines called with lines = %i\n", lines);
-  }
   for (int i = 0; i < lines; i++){
-    printf("%s", get_next_line(fpntr));
+    char * line = get_next_line(fpntr);
+    if (line != NULL){
+      printf("%s\n", line);
+    }
+    else{
+      break;
+    }
   }
 }
 
 
 char * get_next_line(FILE * fpntr){
   static char buff[MAX_LINE_LENGTH];
-  fgets(buff, 100, fpntr); //CHANGE THIS
-  return buff;
+  int pos = 0, next = 0;
+  //! Loop through, get all the characters until it hits newline
+  while ((next = fgetc(fpntr)) != '\n' && next != EOF){
+    buff[pos++] = next;
+  }
+  buff[pos] = '\0';
+
+  if (next == '\n'){
+    return buff;
+  }
+  else{
+    return NULL;
+  }
 }
 
 
@@ -148,12 +162,6 @@ int decode_options(char * opts_to_find, int argc, char * argv[], int * c_option,
     first_file_index = optind;
   }
   //! Tracing Code
-  if(debug == 1){
-    printf("-c argument: %i\n", *c_option);
-    printf("-n argument: %i\n", *n_option);
-    printf("Files specified: %d\n", number_file_inputs);
-    printf("1st File Index: %d\n", first_file_index);
-  }
   return first_file_index;
 }
 
