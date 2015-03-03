@@ -38,13 +38,13 @@ TODO: Capture input from stdin when no files are given
 
 // Global State
 //This variable will enable various code tracing functionality
-int debug = 1;
+int debug = 0;
 // Function Prototypes
 
 
 void print_args(int argc, char * argv[]);
 void head_lines(FILE * fpntr, int lines);
-void head_chars(FILE * fpntr, int * chars);
+void head_chars(FILE * fpntr, int chars);
 char * get_next_line(FILE * fpntr);
 int decode_options(char * opts_to_find, int argc, char * argv[], int * c_option,int * n_option);
 FILE * get_stream(char * file_name);
@@ -67,35 +67,27 @@ void print_args(int argc, char * argv[]){
 // Required functions
 
 
-void head_chars(FILE * fpntr, int * chars){
+void head_chars(FILE * fpntr, int chars){
+  if (debug == 1){
+    printf("head_chars called with chars = %i\n", chars);
+  }
   int chars_iter = 0;
   int c;
-  // if (fpntr == stdin)
-  // {
-  //   chars == INT_MAX;
-  // }
-  // if (fpntr == stdin)
-  // {
-  //   while ((c = fgetc(fpntr)) != EOF)
-  //   {
-  //     printf("%c",c);
-  //   }
-  // }
-  // else
-  // {
-    while ((c = fgetc(fpntr)) != EOF && chars_iter < *chars)
+    while ((c = fgetc(fpntr)) != EOF && chars_iter < chars)
     {
       printf("%c",c);
       chars_iter++;
     }
-  // }
   fclose(fpntr);
 }
 
 
 void head_lines(FILE * fpntr, int lines){
+  if (debug == 1){
+    printf("head_lines called with lines = %i\n", lines);
+  }
   for (int i = 0; i < lines; i++){
-    printf("Line#%i: %s", i+1, get_next_line(fpntr));
+    printf("%s", get_next_line(fpntr));
   }
 }
 
@@ -116,10 +108,8 @@ FILE * get_stream(char * file_name)
   // Will produce a segfault if the file does not exist
   // head checks for a file existing, if not prints:
   //    head: cannot open ‘filename.txt’ for reading: No such file or directory
-  char buffer[MAX_LINE_LENGTH];
   int c;
   FILE * fptr = NULL;
-
   if (((fptr = fopen(file_name, "r")) == NULL)){
     fprintf(stderr, "myhead: cannot open '%s' for reading: No such file or directory\n", file_name);
   }
@@ -176,7 +166,7 @@ int main(int argc, char * argv[])
   // file_ind tracks the index in argv of the first file argument
   // n_option tracks the value of the amount of lines to read from the -n option
   // ok is a flag raised when an error occurs and used to exit with appropriate exit status
-  int file_ind  = 0, c_option = 0, ok = 1;
+  int file_ind  = 0, c_option = -1, ok = 1;
   int n_option = 10;
   FILE * file;
   char * opts_to_find = "n:c:";
@@ -189,9 +179,10 @@ int main(int argc, char * argv[])
   file_ind = decode_options(opts_to_find, argc, argv, &c_option, &n_option);
   if (file_ind == 0){
     // If no file is specified, the index will be 0 and the program
-    // should read from standard input
+    // should read from standard input and exit the program
     file = stdin;
-    head_chars(file, &c_option);
+    head_chars(file, c_option);
+    exit(EXIT_SUCCESS);
   }
   // Dev Hint #2: Loop through file arguments calling fopen() with error checking and print out the file
   //! Loop through file args
@@ -201,15 +192,26 @@ int main(int argc, char * argv[])
     // ==> filename <==
     file = get_stream(argv[i]);
     if (file != NULL){
-      printf("==> %s <==\n", argv[i]);
-      head_lines(file, n_option);
+      //! Print a header if there are multiple files
+      if (argc - 1 - file_ind > 0){
+        printf("==> %s <==\n", argv[i]);
+      }
+      // Dev Hint #3: Call head_lines and head_chars with appropriate arguments, add some tracer code to indicate they were called
+      if (c_option > -1){
+        // Dev Hint #4: head_chars is simpler, so implement that to read characters until the file end or error or read all specified characters
+        head_chars(file, c_option);
+      }
+      else {
+        // Dev Hint #5: Implement head_lines to call get_next_line which is implemented using fgets()
+        // Dev Hint #6: Extend head_lines to loop getting the right number of lines, make it deal with NULL  return from get_next_line, determining if error or file end
+        head_lines(file, n_option);
+      }
     }
     else{
+      //! The specified file does not exist, raise the error flag
       ok = 0;
     }
   }
-  // Prints the first file: printf("argv[%d]: %s\n", file_ind, argv[file_ind]);
-  //head_chars(file, &c_option);
   if (ok == 1){
     exit(EXIT_SUCCESS);
   }
