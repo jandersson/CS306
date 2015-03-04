@@ -3,31 +3,6 @@
   This program attempts to implement the functionality of the GNU head program
 */
 
-/*
-myHead Tests
-Needs to accept -n and -c options
-Needs to accept only basic (positive) counts for options
-Need not accept dashes for file arguments
-Syntax needs to be "myhead [-nN | -cN] [FILE]..."
--n and -c options need to accept an integer argument
-if no options are given, print 10 lines
-argument to options can be immediately adjacent to option e.g. -n25
-handle any number of file arguments, including zero
-myhead test.text
-myhead -n15 test.text
-myhead -c50 test.text
-myhead
-myhead -n15
-myhead test1.text test2.text test3.text
-myhead -n15 test1.text test2.text test3.text
-produce exactly the same output as head with the same options
-must include the following functions:
-    void head_lines(FILE *fpntr, int lines)
-    void head_chars(FILE *fpntr, int chars)
-    char *get_next_line(FILE *fpntr)
-
-TODO: Capture input from stdin when no files are given
- */
 #include <unistd.h>
 #include <getopt.h>
 #include <stdio.h>
@@ -37,7 +12,6 @@ TODO: Capture input from stdin when no files are given
 #define MAX_LINE_LENGTH 100
 
 // Function Prototypes
-
 
 void print_args(int argc, char * argv[]);
 void head_lines(FILE * fpntr, int lines);
@@ -67,14 +41,12 @@ void print_args(int argc, char * argv[]){
 void head_chars(FILE * fpntr, int chars){
   int chars_iter = 0;
   int c;
-    while ((c = fgetc(fpntr)) != EOF && chars_iter < chars)
-    {
+    while ((c = fgetc(fpntr)) != EOF && chars_iter < chars){
       printf("%c",c);
       chars_iter++;
     }
   fclose(fpntr);
 }
-
 
 void head_lines(FILE * fpntr, int lines){
   for (int i = 0; i < lines; i++){
@@ -92,12 +64,10 @@ void head_lines(FILE * fpntr, int lines){
 char * get_next_line(FILE * fpntr){
   static char buff[MAX_LINE_LENGTH];
   int pos = 0, next = 0;
-  //! Loop through, get all the characters until it hits newline
-  while ((next = fgetc(fpntr)) != '\n' && next != EOF){
+  while ((next = fgetc(fpntr)) != '\n' && next != EOF && pos < MAX_LINE_LENGTH){
     buff[pos++] = next;
   }
   buff[pos] = '\0';
-
   if (next == '\n'){
     return buff;
   }
@@ -113,9 +83,6 @@ char * get_next_line(FILE * fpntr){
 FILE * get_stream(char * file_name)
 {
   //! Opens given file and returns a file stream after performing error checking
-  // Will produce a segfault if the file does not exist
-  // head checks for a file existing, if not prints:
-  //    head: cannot open ‘filename.txt’ for reading: No such file or directory
   int c;
   FILE * fptr = NULL;
   if (((fptr = fopen(file_name, "r")) == NULL)){
@@ -175,40 +142,37 @@ int main(int argc, char * argv[])
   //! and the index of the first file argument
   file_ind = decode_options(opts_to_find, argc, argv, &c_option, &n_option);
   if (file_ind == 0){
-    // If no file is specified, the index will be 0 and the program
-    // should read from standard input and exit the program
     file = stdin;
-    head_chars(file, c_option);
-    exit(EXIT_SUCCESS);
-  }
-  // Dev Hint #2: Loop through file arguments calling fopen() with error checking and print out the file
-  //! Loop through file args
-  for (int i = file_ind; i < argc; i++){
-    // Need to print a header if there are multiple files:
-    // head does this:
-    // ==> filename <==
-    file = get_stream(argv[i]);
-    if (file != NULL){
-      //! Print a header if there are multiple files
-      if (argc - 1 - file_ind > 0){
-        printf("==> %s <==\n", argv[i]);
-      }
-      // Dev Hint #3: Call head_lines and head_chars with appropriate arguments, add some tracer code to indicate they were called
-      if (c_option > -1){
-        // Dev Hint #4: head_chars is simpler, so implement that to read characters until the file end or error or read all specified characters
-        head_chars(file, c_option);
-      }
-      else {
-        // Dev Hint #5: Implement head_lines to call get_next_line which is implemented using fgets()
-        // Dev Hint #6: Extend head_lines to loop getting the right number of lines, make it deal with NULL  return from get_next_line, determining if error or file end
-        head_lines(file, n_option);
-      }
+    if (c_option > -1){
+      head_chars(file, c_option);
     }
     else{
-      //! The specified file does not exist, raise the error flag
-      ok = 0;
+      head_lines(file, n_option);
     }
   }
+  else{
+    //! Loop through file args
+    for (int i = file_ind; i < argc; i++){
+      file = get_stream(argv[i]);
+      if (file != NULL){
+        //! Print a header if there are multiple files
+        if (argc - 1 - file_ind > 0){
+          printf("==> %s <==\n", argv[i]);
+        }
+        if (c_option > -1){
+          head_chars(file, c_option);
+        }
+        else {
+          head_lines(file, n_option);
+        }
+      }
+      else{
+        //! The specified file does not exist, raise the error flag
+        ok = 0;
+      }
+    }
+  }
+
   if (ok == 1){
     exit(EXIT_SUCCESS);
   }
