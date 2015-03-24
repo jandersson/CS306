@@ -68,15 +68,15 @@ void head_lines(FILE * fpntr, int lines){
 char * get_next_line(FILE * fpntr){
   static char buff[MAX_LINE_LENGTH + 1];
   int pos = 0, next_character = 0;
-  while ((next_character = fgetc(fpntr)) != '\n' && next_character != EOF && pos < MAX_LINE_LENGTH){
+  while ((next_character = fgetc(fpntr)) != '\n' && next_character != EOF && pos < MAX_LINE_LENGTH + 1){
     buff[pos++] = next_character;
   }
   buff[pos] = '\0';
-  if (next_character == '\n'){
-    return buff;
+  if (next_character == EOF || (ferror(fpntr) && pos == 0) ){
+    return NULL;
   }
   else{
-    return NULL;
+    return buff;
   }
 }
 
@@ -161,6 +161,7 @@ int main(int argc, char * argv[])
       if (file != NULL){
         //! Print a header if there are multiple files
         if (argc - 1 - file_ind > 0){
+          if(i > file_ind) putchar('\n');
           printf("==> %s <==\n", argv[i]);
         }
         if (c_option > -1){
