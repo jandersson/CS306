@@ -25,6 +25,7 @@ void print_usage(char * argv[]);
 
 void print_usage(char * argv[]){
   printf("Usage: %s [-n # | -c #] {FILE}\n", argv[0]);
+  return;
 }
 
 void print_args(int argc, char * argv[]){
@@ -32,6 +33,7 @@ void print_args(int argc, char * argv[]){
   for (int i = 1; i < argc; i++){
     printf("Argument %d: %s\n", i, argv[i]);
   }
+  return;
 }
 
 
@@ -46,6 +48,7 @@ void head_chars(FILE * fpntr, int chars){
       chars_iter++;
     }
   fclose(fpntr);
+  return;
 }
 
 void head_lines(FILE * fpntr, int lines){
@@ -58,17 +61,18 @@ void head_lines(FILE * fpntr, int lines){
       break;
     }
   }
+  return;
 }
 
 
 char * get_next_line(FILE * fpntr){
-  static char buff[MAX_LINE_LENGTH];
-  int pos = 0, next = 0;
-  while ((next = fgetc(fpntr)) != '\n' && next != EOF && pos < MAX_LINE_LENGTH){
-    buff[pos++] = next;
+  static char buff[MAX_LINE_LENGTH + 1];
+  int pos = 0, next_character = 0;
+  while ((next_character = fgetc(fpntr)) != '\n' && next_character != EOF && pos < MAX_LINE_LENGTH){
+    buff[pos++] = next_character;
   }
   buff[pos] = '\0';
-  if (next == '\n'){
+  if (next_character == '\n'){
     return buff;
   }
   else{
