@@ -14,12 +14,12 @@
 // Function Prototypes
 
 void print_args(int argc, char * argv[]);
-void head_lines(FILE * fpntr, int lines);
-void head_chars(FILE * fpntr, int chars);
-char * get_next_line(FILE * fpntr);
+void head_lines(int fd, int lines);
+void head_chars(int fd, int chars);
+char * get_next_line(int fd);
 int get_char(int fd);
 int decode_options(char * opts_to_find, int argc, char * argv[], int * c_option,int * n_option);
-FILE * get_stream(char * file_name);
+int get_stream(char * file_name);
 void print_usage(char * argv[]);
 
 // Display related functions
@@ -40,21 +40,25 @@ void print_args(int argc, char * argv[]){
 
 // Required functions
 
+int get_char(int fd){
+  char buf = -1;
+  return buf;
+}
 
-void head_chars(FILE * fpntr, int chars){
+void head_chars(int fd, int chars){
   int chars_iter = 0;
   int c;
-    while ((c = fgetc(fpntr)) != EOF && chars_iter < chars){
+    while ((c = fgetc(fd)) != EOF && chars_iter < chars){
       printf("%c",c);
       chars_iter++;
     }
-  fclose(fpntr);
+  fclose(fd);
   return;
 }
 
-void head_lines(FILE * fpntr, int lines){
+void head_lines(int fd, int lines){
   for (int i = 0; i < lines; i++){
-    char * line = get_next_line(fpntr);
+    char * line = get_next_line(fd);
     if (line != NULL){
       printf("%s\n", line);
     }
@@ -66,14 +70,14 @@ void head_lines(FILE * fpntr, int lines){
 }
 
 
-char * get_next_line(FILE * fpntr){
+char * get_next_line(int fd){
   static char buff[MAX_LINE_LENGTH + 1];
   int pos = 0, next_character = 0;
-  while ((next_character = fgetc(fpntr)) != '\n' && next_character != EOF && pos < MAX_LINE_LENGTH + 1){
+  while ((next_character = fgetc(fd)) != '\n' && next_character != EOF && pos < MAX_LINE_LENGTH + 1){
     buff[pos++] = next_character;
   }
   buff[pos] = '\0';
-  if (next_character == EOF || (ferror(fpntr) && pos == 0) ){
+  if (next_character == EOF || (ferror(fd) && pos == 0) ){
     return NULL;
   }
   else{
@@ -85,16 +89,16 @@ char * get_next_line(FILE * fpntr){
 // Helper functions
 
 
-FILE * get_stream(char * file_name)
+int get_stream(char * file_name)
 {
   //! Opens given file and returns a file stream after performing error checking
   int c;
-  FILE * fptr = NULL;
+  int fptr = NULL;
   if (((fptr = fopen(file_name, "r")) == NULL)){
     fprintf(stderr, "myhead: cannot open '%s' for reading: No such file or directory\n", file_name);
   }
   else{
-    FILE * fptr = fopen(file_name, "r");
+    int fptr = fopen(file_name, "r");
   }
   return fptr;
 }
@@ -141,7 +145,7 @@ int main(int argc, char * argv[])
   // ok is a flag raised when an error occurs and used to exit with appropriate exit status
   int file_ind  = 0, c_option = -1, ok = 1;
   int n_option = 10;
-  FILE * file;
+  int file;
   char * opts_to_find = "n:c:";
   //! Decode the command line arguments, get the number of lines/chars to print
   //! and the index of the first file argument
