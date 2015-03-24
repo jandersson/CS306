@@ -17,6 +17,7 @@ void print_args(int argc, char * argv[]);
 void head_lines(FILE * fpntr, int lines);
 void head_chars(FILE * fpntr, int chars);
 char * get_next_line(FILE * fpntr);
+int get_char(int fd);
 int decode_options(char * opts_to_find, int argc, char * argv[], int * c_option,int * n_option);
 FILE * get_stream(char * file_name);
 void print_usage(char * argv[]);
