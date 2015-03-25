@@ -13,7 +13,6 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#define MAX_LINE_LENGTH 100
 #define FILE_BUFFER_SIZE 512
 //Initial size for line buffer
 #define INIT_BUFF_SIZE 50
@@ -49,12 +48,38 @@ void print_args(int argc, char * argv[]){
 // Required functions
 
 int get_char(int fd){
-  char buffer;
-  static int buffer_position = 0;
-  if(read(fd, &buffer, 1) < 1)
+  //this does not need to use dynamic memory, just needs to get setup to use a buffer
+  //once the buffer position is at the end, reset it, and fill it again
+  //if the buffer does not get totally filled then the remainder of the buffer will have old data
+  //make a test to see if size and position are equal to each other to determine if it is the first run
+  static char buffer[FILE_BUFFER_SIZE];
+  static int buffer_position;
+  static int size;
+  if(buffer_position == size){
+    //First run of get_char
+    size = read(fd, &buffer, FILE_BUFFER_SIZE);
+    if(!size) return EOF;
+  }
+  if(!size){
     return EOF;
-  else
-    return buffer;
+  }
+  if(buffer_position == size){
+    char last_char;
+    last_char = buffer[buffer_position];
+  }
+//  switch(buffer_position){
+//  case 0:
+//    // read returns 0 on EOF
+//    return EOF;
+//  case -1:
+//    // read returns -1 and sets errno when error occurs
+//    return -1;
+//  default:
+//    return buffer[buffer_position++];
+//  if(read(fd, buffer, 1) < 1)
+//    return EOF;
+//  else
+//    return buffer[buffer_position];
 }
 
 void head_chars(int fd, int chars){
@@ -83,9 +108,16 @@ void head_lines(int fd, int lines){
 
 
 char * get_next_line(int fd){
-  static char buff[MAX_LINE_LENGTH+1];
+  char * buff = malloc(INIT_BUFF_SIZE+1);
   int pos = 0, next_character = 0;
+  int size = INIT_BUFF_SIZE+1;
   while ((next_character = get_char(fd)) != EOF && next_character != '\n'){
+    //increase size of test to check if there is another character
+    if(pos == size){
+      //Needs error checking
+      buff = realloc(buff, INC_BUFF_SIZE);
+      size += INC_BUFF_SIZE;
+    }
     buff[pos++] = next_character;
   }
   buff[pos] = '\0';
