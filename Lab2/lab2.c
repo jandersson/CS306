@@ -8,9 +8,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
 
 #define MAX_LINE_LENGTH 100
-
+#define FILE_BUFFER_SIZE 512
+//Initial size for line buffer
+#define INIT_BUFF_SIZE 50
+//Minimum number of bytes by which line buffer will be expanded
+#define INC_BUFF_SIZE 10
 // Function Prototypes
 
 void print_args(int argc, char * argv[]);
@@ -41,18 +49,22 @@ void print_args(int argc, char * argv[]){
 // Required functions
 
 int get_char(int fd){
-  char buf = -1;
-  return buf;
+  char buffer;
+  static int buffer_position = 0;
+  if(read(fd, &buffer, 1) < 1)
+    return EOF;
+  else
+    return buffer;
 }
 
 void head_chars(int fd, int chars){
   int chars_iter = 0;
   int c;
-    while ((c = fgetc(fd)) != EOF && chars_iter < chars){
+    while ((c = get_char(fd)) != -1 && chars_iter < chars){
       printf("%c",c);
       chars_iter++;
     }
-  fclose(fd);
+  close(fd);
   return;
 }
 
@@ -71,13 +83,13 @@ void head_lines(int fd, int lines){
 
 
 char * get_next_line(int fd){
-  static char buff[MAX_LINE_LENGTH + 1];
+  static char buff[MAX_LINE_LENGTH+1];
   int pos = 0, next_character = 0;
-  while ((next_character = fgetc(fd)) != '\n' && next_character != EOF && pos < MAX_LINE_LENGTH + 1){
+  while ((next_character = get_char(fd)) != EOF && next_character != '\n'){
     buff[pos++] = next_character;
   }
   buff[pos] = '\0';
-  if (next_character == EOF || (ferror(fd) && pos == 0) ){
+  if (next_character == EOF && (errno || pos == 0 )){
     return NULL;
   }
   else{
@@ -92,15 +104,14 @@ char * get_next_line(int fd){
 int get_stream(char * file_name)
 {
   //! Opens given file and returns a file stream after performing error checking
-  int c;
-  int fptr = NULL;
-  if (((fptr = fopen(file_name, "r")) == NULL)){
+  int fd = -1;
+  if ((fd = open(file_name, O_RDONLY)) == -1){
     fprintf(stderr, "myhead: cannot open '%s' for reading: No such file or directory\n", file_name);
   }
   else{
-    int fptr = fopen(file_name, "r");
+    int fd = open(file_name, O_RDONLY);
   }
-  return fptr;
+  return fd;
 }
 
 
@@ -142,8 +153,7 @@ int main(int argc, char * argv[])
   // c_option tracks the value of the amount of characters to read from -c option
   // file_ind tracks the index in argv of the first file argument
   // n_option tracks the value of the amount of lines to read from the -n option
-  // ok is a flag raised when an error occurs and used to exit with appropriate exit status
-  int file_ind  = 0, c_option = -1, ok = 1;
+  int file_ind  = 0, c_option = -1;
   int n_option = 10;
   int file;
   char * opts_to_find = "n:c:";
@@ -151,7 +161,7 @@ int main(int argc, char * argv[])
   //! and the index of the first file argument
   file_ind = decode_options(opts_to_find, argc, argv, &c_option, &n_option);
   if (file_ind == 0){
-    file = stdin;
+    file = 0; //stdin is tied to file descriptor 0
     if (c_option > -1){
       head_chars(file, c_option);
     }
@@ -163,7 +173,7 @@ int main(int argc, char * argv[])
     //! Loop through file args
     for (int i = file_ind; i < argc; i++){
       file = get_stream(argv[i]);
-      if (file != NULL){
+      if (!errno){
         //! Print a header if there are multiple files
         if (argc - 1 - file_ind > 0){
           if(i > file_ind) putchar('\n');
@@ -176,17 +186,13 @@ int main(int argc, char * argv[])
           head_lines(file, n_option);
         }
       }
-      else{
-        //! The specified file does not exist, raise the error flag
-        ok = 0;
-      }
     }
   }
 
-  if (ok == 1){
-    exit(EXIT_SUCCESS);
+  if (errno){
+    exit(EXIT_FAILURE);
   }
   else {
-    exit(EXIT_FAILURE);
+    exit(EXIT_SUCCESS);
   }
 }
