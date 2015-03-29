@@ -53,38 +53,20 @@ int get_char(int fd){
   //if the buffer does not get totally filled then the remainder of the buffer will have old data
   //make a test to see if size and position are equal to each other to determine if it is the first run
   static char buffer[FILE_BUFFER_SIZE];
-  static int buffer_position;
-  static int size;
-  if(buffer_position == size){
+  static int buffer_position = 0;
+  static int size = 0;
+  if(!size || (buffer_position == size)){
     //First run of get_char
     size = read(fd, &buffer, FILE_BUFFER_SIZE);
-    if(!size) return EOF;
+    buffer_position = 0;
   }
-  if(!size){
-    return EOF;
-  }
-  if(buffer_position == size){
-    char last_char;
-    last_char = buffer[buffer_position];
-  }
-//  switch(buffer_position){
-//  case 0:
-//    // read returns 0 on EOF
-//    return EOF;
-//  case -1:
-//    // read returns -1 and sets errno when error occurs
-//    return -1;
-//  default:
-//    return buffer[buffer_position++];
-//  if(read(fd, buffer, 1) < 1)
-//    return EOF;
-//  else
-//    return buffer[buffer_position];
+  if(!size) return EOF;
+  else return buffer[buffer_position++];
 }
 
 void head_chars(int fd, int chars){
   int chars_iter = 0;
-  int c;
+  int c = 0;
     while ((c = get_char(fd)) != -1 && chars_iter < chars){
       printf("%c",c);
       chars_iter++;
@@ -98,8 +80,10 @@ void head_lines(int fd, int lines){
     char * line = get_next_line(fd);
     if (line != NULL){
       printf("%s\n", line);
+      //free(*line);
     }
     else{
+      //free(*line);
       break;
     }
   }
@@ -108,15 +92,24 @@ void head_lines(int fd, int lines){
 
 
 char * get_next_line(int fd){
-  char * buff = malloc(INIT_BUFF_SIZE+1);
   int pos = 0, next_character = 0;
   int size = INIT_BUFF_SIZE+1;
+  char * buff;
+  if((buff = (char *) malloc(size)) == NULL){
+    perror("Virtual memory exhausted");
+    exit(EXIT_FAILURE);
+  }
   while ((next_character = get_char(fd)) != EOF && next_character != '\n'){
     //increase size of test to check if there is another character
     if(pos == size){
+      // DEBUG
+      // printf("Realloc condition fired\n");
+      // printf("Size: %i\n", size);
+      // printf("Pos: %i\n", pos);
+      // printf("String: %s\n", buff);
       //Needs error checking
-      buff = realloc(buff, INC_BUFF_SIZE);
       size += INC_BUFF_SIZE;
+      buff = realloc(buff, size);
     }
     buff[pos++] = next_character;
   }
