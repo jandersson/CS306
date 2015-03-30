@@ -80,10 +80,10 @@ void head_lines(int fd, int lines){
     char * line = get_next_line(fd);
     if (line != NULL){
       printf("%s\n", line);
-      //free(*line);
+      free(line);
     }
     else{
-      //free(*line);
+      free(line);
       break;
     }
   }
