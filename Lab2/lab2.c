@@ -102,12 +102,6 @@ char * get_next_line(int fd){
   while ((next_character = get_char(fd)) != EOF && next_character != '\n'){
     //increase size of test to check if there is another character
     if(pos == size){
-      // DEBUG
-      // printf("Realloc condition fired\n");
-      // printf("Size: %i\n", size);
-      // printf("Pos: %i\n", pos);
-      // printf("String: %s\n", buff);
-      //Needs error checking
       size += INC_BUFF_SIZE;
       buff = realloc(buff, size);
     }
