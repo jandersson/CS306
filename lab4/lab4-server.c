@@ -3,14 +3,17 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <arpa/inet.h>
+#include <string.h>
 
 #define PORT 3060
+#define SECRET "JAA"
 
 int main(void)
 {
-
+    char msg[201];
     // Create Socket
-    int sockfd, connection_fd;
+    int sockfd, connection_fd, nread;
     if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1){
         perror("Could not create socket");
         exit(EXIT_FAILURE);
@@ -24,17 +27,24 @@ int main(void)
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
     if (bind(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) == -1){
-        perror("Could not bind socket");
+        perror("Could not bind socket\n");
         exit(EXIT_FAILURE);
     }
 
     // Listen for connections
     if(listen(sockfd, 10) == -1){
-        perror("Unable to listen for connections");
+        perror("Unable to listen for connections\n");
         exit(EXIT_FAILURE);
     }
 
-    // Complete connection with listening socket, disregarding client address data
-    connection_fd = accept(sockfd, NULL, NULL);
+    while(1){
+        // Complete connection with listening socket, disregarding client address data
+        connection_fd = accept(sockfd, (struct sockaddr *) NULL, NULL);
+        nread = read(connection_fd, msg, 200); msg[nread] = '\0';
+        printf("Client message: %s\n");
+
+        close(connection_fd);
+    }
+
     exit(EXIT_SUCCESS);
 }
