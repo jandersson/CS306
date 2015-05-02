@@ -9,6 +9,13 @@
 #define PORT 3060
 #define SECRET "CS30615spr"
 
+const char * remcp = "<remcp>\n";
+const char * secret = "<JAA>\n";
+const char * ok = "<ok>\n";
+const char * ready = "<ready>\n";
+const char * protocol_send = "<send>\n";
+const char * error = "<error>\n";
+
 void print_usage(char * program_name);
 
 int main(int argc, char * argv[])
@@ -35,7 +42,7 @@ int main(int argc, char * argv[])
         exit(EXIT_FAILURE);
     }
     connection_fd = connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
-    write(connection_fd, msg, strlen(msg));
+    write(connection_fd, remcp, strlen(remcp));
     close(connection_fd);
     exit(EXIT_SUCCESS);
 }
