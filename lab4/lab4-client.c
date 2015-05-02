@@ -56,7 +56,6 @@ int main(int argc, char * argv[])
     nread = read(sockfd, message_buffer, sizeof(message_buffer));
     message_buffer[nread] = '\0';
     printf("Server says: %s\n", message_buffer);
-    close(connection_fd);
     close(sockfd);
     exit(EXIT_SUCCESS);
 }
