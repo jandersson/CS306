@@ -7,10 +7,10 @@
 #include <arpa/inet.h>
 #include <linux/limits.h>
 #define PORT 3060
-#define SECRET "CS30615spr"
+#define SECRET "<CS30615spr>\n"
 
 const char * remcp = "<remcp>\n";
-const char * secret = "<JAA>\n";
+const char * secret = SECRET;
 const char * ok = "<ok>\n";
 const char * ready = "<ready>\n";
 const char * protocol_send = "<send>\n";
@@ -22,12 +22,21 @@ int main(int argc, char * argv[])
 {
     int nread = 0;
     char message_buffer[PATH_MAX];
+    char * file_path = NULL;
+    char * server_ip = NULL;
+
     if (argc < 2){
-        perror("Invalid number of arguments\n");
+        fprintf(stderr, "Invalid number of arguments\n");
         print_usage(argv[0]);
         exit(EXIT_FAILURE);
     }
-    char * server_ip = argv[1];
+
+    server_ip = strtok(argv[1], ":");
+    if ((file_path = strtok(NULL, ":")) == NULL){
+        fprintf(stderr, "Invalid argument format\n");
+        print_usage(argv[0]);
+        exit(EXIT_FAILURE);
+    }
 
     char * msg = "Hello server from client\n";
     // TODO: print error message for file not readable, if its readable, get <ready> back
@@ -49,7 +58,34 @@ int main(int argc, char * argv[])
         perror("Error creating connection socket");
         exit(EXIT_FAILURE);
     }
+
+    // Send <remcp>
     write(sockfd, remcp, strlen(remcp));
+    nread = read(sockfd, message_buffer, sizeof(message_buffer));
+    message_buffer[nread] = '\0';
+    printf("Server says: %s\n", message_buffer);
+
+    // Send <secret>
+    if (strcmp(message_buffer, remcp) == 0){
+        write(sockfd, secret, strlen(secret));
+    }
+    else{
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+    nread = read(sockfd, message_buffer, sizeof(message_buffer));
+    message_buffer[nread] = '\0';
+    printf("Server says: %s\n", message_buffer);
+
+    // Send pathname
+
+    if (strcmp(message_buffer, ok) == 0){
+        write(sockfd, file_path, strlen(file_path));
+    }
+    else{
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
     nread = read(sockfd, message_buffer, sizeof(message_buffer));
     message_buffer[nread] = '\0';
     printf("Server says: %s\n", message_buffer);
