@@ -20,7 +20,7 @@ const char * remcp = "<remcp>\n";
 const char * secret = "<JAA>\n";
 const char * ok = "<ok>\n";
 const char * ready = "<ready>\n";
-const char * send = "<send>\n";
+const char * protocol_send = "<send>\n";
 const char * error = "<error>\n";
 
 int main(void)
