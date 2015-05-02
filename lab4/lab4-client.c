@@ -3,18 +3,21 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
+#include <arpa/inet.h>
 
 #define PORT 3060
-#define SECRET "JAA"
+#define SECRET "CS30615spr"
 
 void print_usage(char * program_name);
 
-int main(void)
+int main(int argc, char * argv[])
 {
-    // Permissions don't matter
+
+    char * msg = "Hello server from client";
     // TODO: Usage print function
     // TODO: print error message for file not readable, if its readable, get <ready> back
-    int sockfd;
+    int sockfd, connection_fd;
     struct sockaddr_in servaddr;
     memset(&servaddr, 0, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
@@ -24,7 +27,9 @@ int main(void)
         perror("Could not create socket");
         exit(EXIT_FAILURE);
     }
-    connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+    connection_fd = connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+    write(connection_fd, msg, strlen(msg));
+    close(connection_fd);
     exit(EXIT_SUCCESS);
 }
 
