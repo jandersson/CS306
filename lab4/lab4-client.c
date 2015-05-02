@@ -21,7 +21,7 @@ int main(int argc, char * argv[])
     }
     char * server_ip = argv[1];
 
-    char * msg = "Hello server from client";
+    char * msg = "Hello server from client\n";
     // TODO: Usage print function
     // TODO: print error message for file not readable, if its readable, get <ready> back
     int sockfd, connection_fd;

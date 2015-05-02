@@ -9,7 +9,7 @@
 #define PORT 3060
 #define SECRET "CS30615spr"
 
-/* Protocol
+/* Remcp Protocol
 
   Client sends <remcp>\n
   Server responds with <remcp>\n
