@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <linux/limits.h>
 
 #define PORT 3060
 #define SECRET "CS30615spr"
@@ -25,7 +26,8 @@ const char * error = "<error>\n";
 
 int main(void)
 {
-    char msg[201];
+
+    char message_buffer[PATH_MAX];
     // Create Socket
     int sockfd, connection_fd, nread;
     if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1){
@@ -54,9 +56,9 @@ int main(void)
     while(1){
         // Complete connection with listening socket, disregarding client address data
         connection_fd = accept(sockfd, (struct sockaddr *) NULL, NULL);
-        nread = read(connection_fd, msg, 200);
-        msg[nread] = '\0';
-        printf("Client message: %s\n", msg);
+        nread = read(connection_fd, message_buffer, 200);
+        message_buffer[nread] = '\0';
+        printf("Client message: %s\n", &message_buffer);
         close(connection_fd);
     }
 
