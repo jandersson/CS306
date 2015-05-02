@@ -56,9 +56,9 @@ int main(void)
     while(1){
         // Complete connection with listening socket, disregarding client address data
         connection_fd = accept(sockfd, (struct sockaddr *) NULL, NULL);
-        nread = read(connection_fd, message_buffer, 200);
+        nread = read(connection_fd, message_buffer, PATH_MAX-1);
         message_buffer[nread] = '\0';
-        printf("Client message: %s\n", *message_buffer);
+        printf("Client message: %s\n", message_buffer);
         close(connection_fd);
     }
 
