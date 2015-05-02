@@ -3,6 +3,8 @@
 .project
 *.user
 *.pro
+*.autosave
+*.pri
 
 # Lab 1
 myhead
