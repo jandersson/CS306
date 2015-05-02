@@ -26,7 +26,6 @@ const char * error = "<error>\n";
 
 int main(void)
 {
-
     char message_buffer[PATH_MAX];
     // Create Socket
     int sockfd, connection_fd, nread;
@@ -55,11 +54,16 @@ int main(void)
 
     while(1){
         // Complete connection with listening socket, disregarding client address data
+        printf("Starting server\n");
         connection_fd = accept(sockfd, (struct sockaddr *) NULL, NULL);
-        nread = read(connection_fd, message_buffer, PATH_MAX-1);
+        printf("Connection created\n");
+        nread = read(sockfd, message_buffer, sizeof(message_buffer));
+        printf("nread: %i\n", nread);
         message_buffer[nread] = '\0';
-        printf("Client message: %s\n", message_buffer);
+        printf("Client says: %s\n", message_buffer);
+        write(sockfd, remcp, strlen(remcp));
         close(connection_fd);
+        close(sockfd);
     }
 
     exit(EXIT_SUCCESS);
