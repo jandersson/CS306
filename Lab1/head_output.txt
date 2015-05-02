@@ -1,0 +1,19 @@
+==> test.txt <==
+1aaaaaaaaaaaaaaaaa.
+2bbbbbbbbbbbbbbbbbbbbbb.
+3ccccccccccccccccccccccccccc.
+4dddddddddddddddddddddd.
+5eeeeeeeeeeeeeeeee.
+6ffffff.
+
+==> lab1.c <==
+//! A head copy-cat
+/*!
+  This program attempts to implement the functionality of the GNU head program
+*/
+
+#include <unistd.h>
+#include <getopt.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
