@@ -14,6 +14,13 @@ void print_usage(char * program_name);
 int main(int argc, char * argv[])
 {
 
+    if (argc < 2){
+        perror("Invalid number of arguments\n");
+        print_usage(argv[0]);
+        exit(EXIT_FAILURE);
+    }
+    char * server_ip = argv[1];
+
     char * msg = "Hello server from client";
     // TODO: Usage print function
     // TODO: print error message for file not readable, if its readable, get <ready> back
@@ -22,7 +29,7 @@ int main(int argc, char * argv[])
     memset(&servaddr, 0, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(PORT);
-    inet_aton("127.0.0.1", &servaddr.sin_addr);
+    inet_aton(server_ip, &servaddr.sin_addr);
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1){
         perror("Could not create socket");
         exit(EXIT_FAILURE);
@@ -34,5 +41,5 @@ int main(int argc, char * argv[])
 }
 
 void print_usage(char * program_name){
-    fprintf(stderr, "Usage: %s IP_ADDRESS:FILE_NAME", program_name);
+    fprintf(stderr, "Usage: %s IP_ADDRESS:FILE_NAME\n", program_name);
 }
