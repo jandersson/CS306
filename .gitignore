@@ -1,3 +1,14 @@
+# Qt files
+.cproject
+.project
+*.user
+*.pro
+
+# Lab 1
+myhead
+
+# Lab 3
+a.out
 
 # Lab 4
 remcpd

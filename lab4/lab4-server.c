@@ -7,7 +7,21 @@
 #include <string.h>
 
 #define PORT 3060
-#define SECRET "JAA"
+#define SECRET "CS30615spr"
+
+/* Protocol
+
+  Client sends <remcp>\n
+  Server responds with <remcp>\n
+  Client sends secret\n
+
+*/
+const char * remcp = "<remcp>\n";
+const char * secret = "<JAA>\n";
+const char * ok = "<ok>\n";
+const char * ready = "<ready>\n";
+const char * send = "<send>\n";
+const char * error = "<error>\n";
 
 int main(void)
 {
@@ -40,9 +54,9 @@ int main(void)
     while(1){
         // Complete connection with listening socket, disregarding client address data
         connection_fd = accept(sockfd, (struct sockaddr *) NULL, NULL);
-        nread = read(connection_fd, msg, 200); msg[nread] = '\0';
-        printf("Client message: %s\n");
-
+        nread = read(connection_fd, msg, 200);
+        msg[nread] = '\0';
+        printf("Client message: %s\n", msg);
         close(connection_fd);
     }
 
