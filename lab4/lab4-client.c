@@ -49,9 +49,6 @@ int main(int argc, char * argv[])
         perror("Error creating connection socket");
         exit(EXIT_FAILURE);
     }
-
-    printf("remcp: %s\n", remcp);
-    printf("strlen(remcp): %i\n", strlen(remcp));
     write(sockfd, remcp, strlen(remcp));
     nread = read(sockfd, message_buffer, sizeof(message_buffer));
     message_buffer[nread] = '\0';
