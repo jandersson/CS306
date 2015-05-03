@@ -23,6 +23,8 @@ int main(int argc, char * argv[])
     int nread = 0;
     char message_buffer[PATH_MAX];
     char * file_path = NULL;
+    char * file_name = NULL;
+    char * strtok_token = NULL;
     char * server_ip = NULL;
     FILE * file_copy = NULL;
     int sockfd = 0;
@@ -41,6 +43,12 @@ int main(int argc, char * argv[])
         fprintf(stderr, "Invalid argument format\n");
         print_usage(argv[0]);
         exit(EXIT_FAILURE);
+    }
+
+    // Extract file name from path if nested
+    file_name = strtok(file_path, "/");
+    while( (strtok_token = strtok(NULL, "/")) != NULL){
+        file_name = strtok_token;
     }
 
     // Setup socket data structures
@@ -103,7 +111,7 @@ int main(int argc, char * argv[])
     // Check for <ready> from server, if found, create file for copying and send <send>
     if(strcmp(message_buffer, ready) == 0){
 
-        if( (file_copy = fopen(file_path, "wb")) == NULL ){
+        if( (file_copy = fopen(file_name, "wb")) == NULL ){
             perror("Error opening file for writing");
             close(sockfd);
             exit(EXIT_FAILURE);
