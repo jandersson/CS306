@@ -36,10 +36,8 @@ int main(int argc, char * argv[])
         fprintf(stderr, "Invalid number of arguments\n");
         print_usage(argv[0]);
         exit(EXIT_FAILURE);
-    }
-    printf("first copy\n");
+    };
     server_ip = strtok(argv[1], ":");
-    printf("server ip: %s\n", server_ip);
     if ( (file_path = strtok(NULL, ":")) == NULL){
         fprintf(stderr, "Invalid argument format\n");
         print_usage(argv[0]);
@@ -50,15 +48,11 @@ int main(int argc, char * argv[])
         file_name = malloc(strlen(file_path + 1));
         strcpy(file_name, file_path);
     }
-    printf("File path: %s\n", file_path);
-    printf("File name: %s\n", file_name);
     // Extract file name from path if nested
     file_name = strtok(file_name, "/");
     while( (strtok_token = strtok(NULL, "/")) != NULL){
         file_name = strtok_token;
     }
-    printf("File path: %s\n", file_path);
-    printf("File name: %s\n", file_name);
     // Setup socket data structures
     memset(&servaddr, 0, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
@@ -95,7 +89,7 @@ int main(int argc, char * argv[])
     message_buffer[nread] = '\0';
     printf("Server says: %s\n", message_buffer);
 
-    // Send pathname
+    // If server says <ok>, send pathname to server
 
     if (strcmp(message_buffer, ok) == 0){
         write(sockfd, file_path, strlen(file_path));
