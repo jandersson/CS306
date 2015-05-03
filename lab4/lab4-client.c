@@ -25,6 +25,8 @@ int main(int argc, char * argv[])
     char * file_path = NULL;
     char * server_ip = NULL;
     FILE * file_copy = NULL;
+    int sockfd = 0;
+    struct sockaddr_in servaddr;
 
     // Validate command line arguments and retrieve server IP and file path
 
@@ -41,10 +43,7 @@ int main(int argc, char * argv[])
         exit(EXIT_FAILURE);
     }
 
-    char * msg = "Hello server from client\n";
-    // TODO: server will print error message for file not readable, if its readable, get <ready> back
-    int sockfd;
-    struct sockaddr_in servaddr;
+    // Setup socket data structures
     memset(&servaddr, 0, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(PORT);
@@ -105,14 +104,14 @@ int main(int argc, char * argv[])
     if(strcmp(message_buffer, ready) == 0){
 
         // TODO: Error check fopen
-        file_copy = fopen(file_path, "wb");
-        printf("Opened file for writing\n");
+        if( (file_copy = fopen(file_path, "wb")) == NULL ){
+            perror("Error opening file for writing");
+            close(sockfd);
+            exit(EXIT_FAILURE);
+        }
         write(sockfd, protocol_send, strlen(protocol_send));
     }
     while((nread = read(sockfd, message_buffer, sizeof(message_buffer))) > 0){
-        //nread = read(sockfd, message_buffer, sizeof(message_buffer));
-        message_buffer[nread] = '\0';
-        printf("Server says: %s\n", message_buffer);
         fwrite(message_buffer, 1, nread, file_copy);
     }
 
