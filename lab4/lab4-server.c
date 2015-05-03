@@ -34,8 +34,7 @@ void handle_client(int connection_fd){
     char message_buffer[PATH_MAX + 1];
     FILE * target_file = NULL;
     char * file_path = NULL;
-    size_t bytes_read;
-    int bytes_sent;
+    size_t bytes_read, bytes_sent;
     // Read <remcp>\n
     bytes_read = read(connection_fd, message_buffer, sizeof(message_buffer));
     message_buffer[bytes_read] = '\0';
