@@ -24,6 +24,9 @@ int main(int argc, char * argv[])
     char message_buffer[PATH_MAX];
     char * file_path = NULL;
     char * server_ip = NULL;
+    FILE * file_copy = NULL;
+
+    // Validate command line arguments and retrieve server IP and file path
 
     if (argc < 2){
         fprintf(stderr, "Invalid number of arguments\n");
@@ -39,7 +42,7 @@ int main(int argc, char * argv[])
     }
 
     char * msg = "Hello server from client\n";
-    // TODO: print error message for file not readable, if its readable, get <ready> back
+    // TODO: server will print error message for file not readable, if its readable, get <ready> back
     int sockfd;
     struct sockaddr_in servaddr;
     memset(&servaddr, 0, sizeof(servaddr));
@@ -83,12 +86,37 @@ int main(int argc, char * argv[])
         write(sockfd, file_path, strlen(file_path));
     }
     else{
+        fprintf(stderr, "Remcp protocol error\n");
         close(sockfd);
         exit(EXIT_FAILURE);
     }
+
+    // Check for <error> from server, if found, terminate client
     nread = read(sockfd, message_buffer, sizeof(message_buffer));
     message_buffer[nread] = '\0';
     printf("Server says: %s\n", message_buffer);
+    if (strcmp(message_buffer, error) == 0){
+        fprintf(stderr, "File could not be copied\n");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
+    // Check for <ready> from server, if found, create file for copying and send <send>
+    if(strcmp(message_buffer, ready) == 0){
+
+        // TODO: Error check fopen
+        file_copy = fopen(file_path, "wb");
+        printf("Opened file for writing\n");
+        write(sockfd, protocol_send, strlen(protocol_send));
+    }
+    while((nread = read(sockfd, message_buffer, sizeof(message_buffer))) > 0){
+        //nread = read(sockfd, message_buffer, sizeof(message_buffer));
+        message_buffer[nread] = '\0';
+        printf("Server says: %s\n", message_buffer);
+        fwrite(message_buffer, 1, nread, file_copy);
+    }
+
+
     close(sockfd);
     exit(EXIT_SUCCESS);
 }
