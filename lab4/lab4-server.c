@@ -35,6 +35,7 @@ void handle_client(int connection_fd){
     FILE * target_file = NULL;
     char * file_path = NULL;
     size_t bytes_read, bytes_sent;
+
     // Read <remcp>\n
     bytes_read = read(connection_fd, message_buffer, sizeof(message_buffer));
     message_buffer[bytes_read] = '\0';
@@ -43,7 +44,11 @@ void handle_client(int connection_fd){
     if(strcmp(message_buffer, remcp) == 0){
         send(connection_fd, remcp, strlen(remcp), 0);
     }
-    else close(connection_fd);
+    else{
+        close(connection_fd);
+        return;
+    }
+
 
     // Read <secret>\n
     bytes_read = read(connection_fd, message_buffer, sizeof(message_buffer));
@@ -53,7 +58,10 @@ void handle_client(int connection_fd){
     if(strcmp(message_buffer, secret) == 0){
         write(connection_fd, ok, strlen(ok));
     }
-    else close(connection_fd);
+    else{
+        close(connection_fd);
+        return;
+    }
 
     // Read file pathname
     bytes_read = read(connection_fd, message_buffer, sizeof(message_buffer));
@@ -63,8 +71,8 @@ void handle_client(int connection_fd){
     // Try to open the specified file, if invalid send error and terminate the connection
     if ((target_file = fopen(file_path, "rb")) == NULL){
         write(connection_fd, error, strlen(error));
-        fclose(target_file);
         close(connection_fd);
+        return;
     }
     else{
         // File exists, send <ready>
@@ -82,12 +90,15 @@ void handle_client(int connection_fd){
         }
         fclose(target_file);
         close(connection_fd);
+        return;
     }
     else{
         write(connection_fd, error, strlen(error));
         fclose(target_file);
         close(connection_fd);
+        return;
     }
+    return;
 }
 
 int main(void)
