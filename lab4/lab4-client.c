@@ -95,7 +95,7 @@ int main(int argc, char * argv[])
     message_buffer[nread] = '\0';
     printf("Server says: %s\n", message_buffer);
     if (strcmp(message_buffer, error) == 0){
-        fprintf(stderr, "File could not be copied\n");
+        fprintf(stderr, "Requested file not found\n");
         close(sockfd);
         exit(EXIT_FAILURE);
     }
@@ -103,7 +103,6 @@ int main(int argc, char * argv[])
     // Check for <ready> from server, if found, create file for copying and send <send>
     if(strcmp(message_buffer, ready) == 0){
 
-        // TODO: Error check fopen
         if( (file_copy = fopen(file_path, "wb")) == NULL ){
             perror("Error opening file for writing");
             close(sockfd);
@@ -114,7 +113,6 @@ int main(int argc, char * argv[])
     while((nread = read(sockfd, message_buffer, sizeof(message_buffer))) > 0){
         fwrite(message_buffer, 1, nread, file_copy);
     }
-
 
     close(sockfd);
     exit(EXIT_SUCCESS);
