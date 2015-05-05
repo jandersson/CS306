@@ -34,7 +34,7 @@ void handle_client(int connection_fd){
     char message_buffer[PATH_MAX + 1];
     FILE * target_file = NULL;
     char * file_path = NULL;
-    size_t bytes_read, bytes_sent;
+    size_t bytes_read = 0;
 
     // Read <remcp>\n
     bytes_read = read(connection_fd, message_buffer, sizeof(message_buffer));
@@ -86,7 +86,7 @@ void handle_client(int connection_fd){
     if (strcmp(message_buffer, protocol_send) == 0){
         // loop through the file, reading blocks, sending them to the client
         while( (bytes_read = fread(file_data, sizeof(char), 4096, target_file)) > 0 ){
-            bytes_sent = send(connection_fd, file_data, bytes_read, 0);
+            send(connection_fd, file_data, bytes_read, 0);
         }
         fclose(target_file);
         close(connection_fd);
