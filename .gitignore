@@ -6,6 +6,9 @@
 *.autosave
 *.pri
 
+# Exam 3
+p1
+
 # Lab 1
 myhead
 
